@@ -123,13 +123,13 @@ def swissPairings():
     """
     results = []
     c.execute(sql)
-    cnt = 1
-    for row in c.fetchall():
-        if cnt % 2 == 0:
-            results.append((player1_id, player1_name, row[0], row[1]))
-        else:
-            player1_id = row[0]
-            player1_name = row[1]
+    cnt = 0
+    for row in c:
         cnt += 1
+        if cnt % 2 != 0:
+            player1_id = str(row[0])
+            player1_name = row[1]
+        else:
+            results.append((player1_id, player1_name, str(row[0]), row[1]))
     conn.close()
     return results

@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS matches;
 
 CREATE TABLE players (
   player_id SERIAL primary key,
-  name text,
+  name text
 );
 
 CREATE TABLE matches (
