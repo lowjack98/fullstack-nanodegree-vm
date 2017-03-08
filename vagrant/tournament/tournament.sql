@@ -5,11 +5,9 @@
 --
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
-DROP VIEW IF EXISTS matches_tally;
-DROP VIEW IF EXISTS winners_tally;
-DROP VIEW IF EXISTS losers_tally;
-DROP TABLE IF EXISTS players;
-DROP TABLE IF EXISTS matches;
+DROP DATABASE IF EXISTS tournament;
+CREATE DATABASE tournament;
+\c tournament
 
 CREATE TABLE players (
   player_id SERIAL primary key,
@@ -18,8 +16,8 @@ CREATE TABLE players (
 
 CREATE TABLE matches (
   match_id SERIAL primary key,
-  winner integer,
-  loser integer
+  winner integer REFERENCES players(player_id),
+  loser integer REFERENCES players(player_id)
 );
 
 -- This view provides a list of each player with their total number of wins
@@ -50,3 +48,11 @@ CREATE VIEW matches_tally
     FROM losers_tally
   ) AS matches_tally
   GROUP BY player_id;
+
+-- This view provides the current player standings
+CREATE VIEW playerStandings
+  AS SELECT p.player_id, p.name, w.win_tally, m.tot_num_matches
+    FROM players p
+    LEFT OUTER JOIN winners_tally w ON p.player_id=w.player_id
+    LEFT OUTER JOIN matches_tally m ON p.player_id=m.player_id
+    ORDER BY w.win_tally DESC, p.name;
