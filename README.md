@@ -35,24 +35,37 @@ DB is setup and all the methods are working correctly.
 ## Module Methods
 
 - connect(database_name):
+
 Connects to the PostgreSQL database.  
+
    Returns a database connection and cursor.
 
+
 - deleteMatches():
+
 Removes all the match records from the database.
 
+
 - deletePlayers():
+
 Removes all the player records from the database.
 
+
 - countPlayers():
+
 Returns the number of players currently registered.
 
+
 - registerPlayer(name):
+
 Adds a player to the tournament database.
+
      Args:
        name: the player's full name (need not be unique).
 
+
 - playerStandings():
+
 Returns a list of the players and their win records, sorted by wins.
 
      The first entry in the list will be the player in first place, or a
@@ -67,13 +80,16 @@ Returns a list of the players and their win records, sorted by wins.
 
 
 - reportMatch(winner, loser):
+
 Records the outcome of a single match between two players.
+
      Args:
        winner:  the id number of the player who won
        loser:  the id number of the player who lost
 
 
 - swissPairings():
+
 Returns a list of pairs of players for the next round of a match.
 
      Assuming that there are an even number of players registered, each player
