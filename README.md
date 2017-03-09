@@ -34,29 +34,29 @@ DB is setup and all the methods are working correctly.
 
 ## Module Methods
 
-- connect(database_name):
+- __connect(database_name)__:
 
 Connects to the PostgreSQL database.  
 
    Returns a database connection and cursor.
 
 
-- deleteMatches():
+- __deleteMatches()__:
 
 Removes all the match records from the database.
 
 
-- deletePlayers():
+- __deletePlayers()__:
 
 Removes all the player records from the database.
 
 
-- countPlayers():
+- __countPlayers()__:
 
 Returns the number of players currently registered.
 
 
-- registerPlayer(name):
+- __registerPlayer(name)__:
 
 Adds a player to the tournament database.
 
@@ -64,7 +64,7 @@ Adds a player to the tournament database.
        name: the player's full name (need not be unique).
 
 
-- playerStandings():
+- __playerStandings()__:
 
 Returns a list of the players and their win records, sorted by wins.
 
@@ -79,7 +79,7 @@ Returns a list of the players and their win records, sorted by wins.
          matches: the number of matches the player has played
 
 
-- reportMatch(winner, loser):
+- __reportMatch(winner, loser)__:
 
 Records the outcome of a single match between two players.
 
@@ -88,7 +88,7 @@ Records the outcome of a single match between two players.
        loser:  the id number of the player who lost
 
 
-- swissPairings():
+- __swissPairings()__:
 
 Returns a list of pairs of players for the next round of a match.
 
