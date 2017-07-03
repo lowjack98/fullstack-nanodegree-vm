@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2 class="text-center">Warning!</h2>
+  <p class="text-center text-danger">
+    Are you sure you want to delete the category titled "{{ category.name }}"?
+  </p>
+  <div class="text-center">
+
+      <ul class="pager">
+        <li>
+          <form method="post" action="{{ url_for('deleteCategory', category_id = category.id) }}" class="inline">
+            <button type="submit" class="btn btn-lg btn-danger btn-round-lg">Delete</button>
+          </form>
+        </li>
+        <li>
+          <form method="get" action="{{ url_for('showCategories') }}" class="inline">
+            <button type="submit" class="btn btn-lg btn-default btn-round-lg">Cancel</button>
+          </form>
+        </li>
+      </ul>
+
+  </div>
+  <p class="text-center">
+    <a href="\blog">Home</a>
+  </p>
+{% endblock %}

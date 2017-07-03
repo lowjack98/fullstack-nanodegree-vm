@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2 class="text-center">Goodbye, {{username}}!</h2>
+
+  <p class="text-center">
+    <a href="{{ url_for('showCategories') }}">Home</a>
+  </p>
+{% endblock %}

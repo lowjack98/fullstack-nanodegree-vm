@@ -1,0 +1,36 @@
+<div class="col-xs-6">
+  <div class="menu-category list-group">
+    <div class="menu-category-name list-group-item active">
+      <div class="row">
+        <div class="col-xs-6">Category</div>
+        {% if user.credentials %}
+          <div class="col-xs-6 text-right">
+            <a href="{{ url_for('createCategory') }}" class="active text-white">
+              <span class="glyphicon glyphicon-plus text-white"  aria-hidden="true"></span>
+              Add
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% for cat in categories %}
+      <div class="menu-item list-group-item hover-grey">
+        <div class="row">
+          <div class="col-xs-10">
+            <a href="{{ url_for('showCatItems',category_id = cat.id) }}">{{ cat.name }}</a>
+          </div>
+          {% if user.credentials %}
+            <div class="col-xs-2 text-right">
+              <a href="{{ url_for('updateCategory',category_id = cat.id) }}">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+              </a>
+              <a href="{{ url_for('deleteCategory',category_id = cat.id) }}">
+                <span class="glyphicon glyphicon-trash"  aria-hidden="true"></span>
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>

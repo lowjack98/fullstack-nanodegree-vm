@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2>Item Detail</h2>
+
+  <div class="form-group">
+    <label for="itemName">Item Name</label>
+    <input type="text" id="itemName" name="itemName" value="{{item.name}}" class="form-control" readonly>
+  </div>
+  <div class="form-group">
+    <label for="itemCat">Item Catalog</label>
+    <input type="text" id="itemCat" name="itemCat" value="{{item.category.name}}" class="form-control" readonly>
+  </div>
+  <div class="form-group">
+    <label for="itemDesc">Item Description</label>
+    <textarea id="itemDesc" name="itemDesc" class="form-control" style="height: 15em;" readonly>{{item.description}}</textarea>
+  </div>
+  <form method="get" action="{{ url_for('showCatItems', category_id=item.category.id) }}" class="inline">
+    <button type="submit" class="btn btn-lg btn-default btn-round-lg">Home</button>
+  </form>
+{% endblock %}

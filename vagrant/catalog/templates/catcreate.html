@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2>Create Category</h2>
+
+  <form action="{{ url_for('createCategory') }}" method="post">
+    <div class="form-group">
+      <label for="catTitle">Category Title</label>
+      <input type="text" id="catTitle" name="catTitle" value="{{catTitle}}" class="form-control" placeholder="Title" required autofocus>
+    </div>
+    <div class="form-group">
+      <label for="catDesc">Category Description</label>
+      <textarea id="catDesc" name="catDesc" class="form-control" placeholder="Description" style="height: 15em;" required>{{catDesc}}</textarea>
+    </div>
+    <nav>
+      <ul class="pager">
+        <li>
+          <button type="submit" class="btn btn-lg btn-primary btn-round-lg">Create</button>
+          </form>
+        </li>
+        <li>
+          <form method="get" action="{{ url_for('showCategories') }}" class="inline">
+            <button type="submit" class="btn btn-lg btn-default btn-round-lg">Cancel</button>
+          </form>
+        </li>
+      </ul>
+    </nav>
+  </form>
+{% endblock %}

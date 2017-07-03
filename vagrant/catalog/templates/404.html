@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2 class="text-center">Warning!</h2>
+  <p class="text-center text-danger">
+    Error 404: Page Not Found!
+  </p>
+
+  <p class="text-center">
+    <a href="{{ url_for('showCategories') }}">Home</a>
+  </p>
+{% endblock %}

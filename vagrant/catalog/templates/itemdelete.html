@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2 class="text-center">Warning!</h2>
+  <p class="text-center text-danger">
+    Are you sure you want to delete the item titled "{{item.name}}"?
+  </p>
+  <div class="text-center">
+
+      <ul class="pager">
+        <li>
+          <form method="post" action="{{ url_for('deleteCatItem', category_id=item.category.id, item_id=item.id) }}" class="inline">
+            <button type="submit" class="btn btn-lg btn-danger btn-round-lg">Delete</button>
+          </form>
+        </li>
+        <li>
+          <form method="get" action="{{ url_for('showCatItems', category_id=item.category.id) }}" class="inline">
+            <button type="submit" class="btn btn-lg btn-default btn-round-lg">Cancel</button>
+          </form>
+        </li>
+      </ul>
+
+  </div>
+{% endblock %}
