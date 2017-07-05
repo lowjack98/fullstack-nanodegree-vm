@@ -14,6 +14,7 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     description = Column(String(250), nullable=True)
+    items = relationship("CatItem", cascade='all,delete-orphan')
 
     @property
     def serialize(self):
@@ -32,7 +33,7 @@ class CatItem(Base):
     name = Column(String(80), nullable=False)
     description = Column(String(250))
     category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship(Category)
+    category = relationship("Category")
 
     @property
     def serialize(self):
@@ -41,6 +42,21 @@ class CatItem(Base):
             'name': self.name,
             'id': self.id,
             'description': self.description
+        }
+
+
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+
+    @property
+    def serialize(self):
+        # Returns object data in easily serializeable format
+        return {
+            'name': self.name,
+            'id': self.id
         }
 
 

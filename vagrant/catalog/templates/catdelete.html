@@ -4,6 +4,10 @@
   <h2 class="text-center">Warning!</h2>
   <p class="text-center text-danger">
     Are you sure you want to delete the category titled "{{ category.name }}"?
+    {% if item_cnt > 0 %}
+      <br>
+      Deleting this category will also remove {{ item_cnt }} items!
+    {% endif %}
   </p>
   <div class="text-center">
 
