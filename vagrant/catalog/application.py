@@ -67,7 +67,8 @@ def showLogin():
 @verify_login
 def registerUser():
     # Show register form for GET
-    auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+    auth_user = session.query(User).\
+                        filter_by(auth_id=login_session['auth_id']).first()
     if auth_user:
         # user already exists, send to homepage
         flash("You are already registered!", "alert-success")
@@ -88,13 +89,11 @@ def registerUser():
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    #if request.args.post('state') != login_session['state']:
     if request.form['state'] != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Obtain authorization code
-    #code = request.data
     code = request.form['data']
 
     try:
@@ -164,7 +163,8 @@ def gconnect():
     login_session['auth_id'] = data['id']
 
     # if user doesn't exist in db reroute to signup page
-    auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+    auth_user = session.query(User).\
+                        filter_by(auth_id=login_session['auth_id']).first()
     if not auth_user:
         flash("You are not a registered user.", "alert-danger")
         return redirect(url_for('registerUser'))
@@ -188,7 +188,6 @@ def gdisconnect():
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
         # clear user data from session
-        #del login_session['credentials']
         del login_session['gplus_id']
         del login_session['username']
         del login_session['email']
