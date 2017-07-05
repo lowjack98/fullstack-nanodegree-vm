@@ -1,4 +1,4 @@
-from database_setup import Base, Category, CatItem
+from database_setup import Base, Category, CatItem, User
 from flask import Flask, render_template, request, redirect, url_for
 from flask import flash, jsonify
 from flask import make_response
@@ -29,12 +29,26 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-def login_required(f):
+def verify_login(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'credentials' not in login_session:
+        if 'access_token' not in login_session:
             flash("You must be logged in for that action.", "alert-danger")
             return redirect(url_for('showLogin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def verify_auth(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'access_token' not in login_session:
+            flash("You must be logged in for that action.", "alert-danger")
+            return redirect(url_for('showLogin'))
+        auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+        if not auth_user:
+            flash("You are not a registered user.", "alert-danger")
+            return redirect(url_for('registerUser'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -48,15 +62,35 @@ def showLogin():
     return render_template('login-form.html', STATE=state, user=login_session)
 
 
+@app.route('/register', methods=['GET', 'POST'])
+@verify_login
+def registerUser():
+    # Show update form for GET
+    # auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+    if request.method == 'POST':
+        newUser = User(auth_id=login_session['auth_id'],
+                       name=login_session['username'],
+                       email=login_session['email'])
+        session.add(newUser)
+        session.commit()
+        flash("You are now registered!", "alert-success")
+        return redirect(url_for('showCategories'))
+    else:
+        flash("To register click Register below.", "alert-success")
+        return render_template('signup-form.html', user=login_session)
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    if request.args.get('state') != login_session['state']:
+    #if request.args.post('state') != login_session['state']:
+    if request.form['state'] != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Obtain authorization code
-    code = request.data
+    #code = request.data
+    code = request.form['data']
 
     try:
         # Upgrade the authorization code into a credentials object
@@ -106,35 +140,34 @@ def gconnect():
         return response
 
     # Store the access token in the session for later use.
-    login_session['credentials'] = credentials.to_json()
-    print "credentials: "+credentials.to_json()+"\n"
+    #login_session['credentials'] = credentials.to_json()
+    #print "credentials: "+credentials.to_json()+"\n"
     login_session['gplus_id'] = gplus_id
     print "gplus_id: "+gplus_id+"\n"
     login_session['access_token'] = credentials.access_token
 
     # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
-    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    params = {'access_token': login_session['access_token'], 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
 
     data = answer.json()
+    print "user data: "+json.dumps(data)+"\n"
 
     # Store user data in session
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: '
-    output += '150px; -webkit-border-radius: 150px;-moz-border-radius: 150px;'
-    output += '"> '
-    flash("you are now logged in as %s" % login_session['username'],
-          "alert-success")
-    return output
+    login_session['auth_id'] = data['id']
+
+    # if user doesn't exist in db reroute to signup page
+    auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+    if not auth_user:
+        flash("You are not a registered user.", "alert-danger")
+        return redirect(url_for('registerUser'))
+
+    # Otherwise complete login
+    return redirect(url_for('showCategories'))
 
 
 @app.route('/gdisconnect')
@@ -152,7 +185,7 @@ def gdisconnect():
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
         # clear user data from session
-        del login_session['credentials']
+        #del login_session['credentials']
         del login_session['gplus_id']
         del login_session['username']
         del login_session['email']
@@ -178,7 +211,7 @@ def showCategories():
 
 
 @app.route('/catalog/new', methods=['GET', 'POST'])
-@login_required
+@verify_auth
 def createCategory():
     # Show add form for GET
     # Add record on POST
@@ -195,7 +228,7 @@ def createCategory():
 
 
 @app.route('/catalog/<int:category_id>/edit', methods=['GET', 'POST'])
-@login_required
+@verify_auth
 def updateCategory(category_id):
     # Show update form for GET
     # Update record on POST
@@ -215,7 +248,7 @@ def updateCategory(category_id):
 
 
 @app.route('/catalog/<int:category_id>/delete', methods=['GET', 'POST'])
-@login_required
+@verify_auth
 def deleteCategory(category_id):
     # Show delete form for GET
     # Remove record on POST
@@ -251,7 +284,7 @@ def showCatItemDetail(category_id, item_id):
 
 
 @app.route('/catalog/<int:category_id>/items/new', methods=['GET', 'POST'])
-@login_required
+@verify_auth
 def createCatItem(category_id):
     # Show add form for GET
     # Add record on POST
@@ -272,7 +305,7 @@ def createCatItem(category_id):
 
 @app.route('/catalog/<int:category_id>/items/<int:item_id>/edit',
            methods=['GET', 'POST'])
-@login_required
+@verify_auth
 def editCatItem(category_id, item_id):
     # Show update form for GET
     # Update record on POST
@@ -298,7 +331,7 @@ def editCatItem(category_id, item_id):
 
 @app.route('/catalog/<int:category_id>/items/<int:item_id>/delete',
            methods=['GET', 'POST'])
-@login_required
+@verify_auth
 def deleteCatItem(category_id, item_id):
     # Show delete form for GET
     # Remove record on POST

@@ -49,14 +49,18 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    auth_id = Column(Integer, nullable=False)
+    name = Column(String(80), nullable=False)
+    email = Column(String(80))
 
     @property
     def serialize(self):
         # Returns object data in easily serializeable format
         return {
+            'id': self.id,
+            'auth_id': self.auth_id,
             'name': self.name,
-            'id': self.id
+            'email': self.email
         }
 
 

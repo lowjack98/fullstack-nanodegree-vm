@@ -27,7 +27,7 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="/catalog">Home</a></li>
           </ul>
-          {% if user.credentials %}
+          {% if user.access_token %}
           <p class="navbar-text navbar-right"><a href="{{ url_for('gdisconnect') }}" class="navbar-link"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout ({{user.username}})</a></p>
           {% else %}
           <p class="navbar-text navbar-right"><a href="{{ url_for('showLogin') }}" class="navbar-link"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login</a></p>

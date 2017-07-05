@@ -3,7 +3,7 @@
     <div class="menu-category-name list-group-item active">
       <div class="row">
         <div class="col-xs-6">Category</div>
-        {% if user.credentials %}
+        {% if user.access_token %}
           <div class="col-xs-6 text-right">
             <a href="{{ url_for('createCategory') }}" class="active text-white">
               <span class="glyphicon glyphicon-plus text-white"  aria-hidden="true"></span>
@@ -19,7 +19,7 @@
           <div class="col-xs-10">
             <a href="{{ url_for('showCatItems',category_id = cat.id) }}">{{ cat.name }}</a>
           </div>
-          {% if user.credentials %}
+          {% if user.access_token %}
             <div class="col-xs-2 text-right">
               <a href="{{ url_for('updateCategory',category_id = cat.id) }}">
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
