@@ -45,7 +45,8 @@ def verify_auth(f):
         if 'access_token' not in login_session:
             flash("You must be logged in for that action.", "alert-danger")
             return redirect(url_for('showLogin'))
-        auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+        auth_user = session.query(User)./
+        filter_by(auth_id=login_session['auth_id']).first()
         if not auth_user:
             flash("You are not a registered user.", "alert-danger")
             return redirect(url_for('registerUser'))
@@ -65,8 +66,12 @@ def showLogin():
 @app.route('/register', methods=['GET', 'POST'])
 @verify_login
 def registerUser():
-    # Show update form for GET
-    # auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+    # Show register form for GET
+    auth_user = session.query(User).filter_by(auth_id=login_session['auth_id']).first()
+    if auth_user:
+        # user already exists, send to homepage
+        flash("You are already registered!", "alert-success")
+        return redirect(url_for('showCategories'))
     if request.method == 'POST':
         newUser = User(auth_id=login_session['auth_id'],
                        name=login_session['username'],
@@ -127,7 +132,7 @@ def gconnect():
     if result['issued_to'] != CLIENT_ID:
         response = make_response(
             json.dumps("Token's client ID does not match app's."), 401)
-        print "Token's client ID does not match app's."
+        # print "Token's client ID does not match app's."
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -140,10 +145,8 @@ def gconnect():
         return response
 
     # Store the access token in the session for later use.
-    #login_session['credentials'] = credentials.to_json()
-    #print "credentials: "+credentials.to_json()+"\n"
     login_session['gplus_id'] = gplus_id
-    print "gplus_id: "+gplus_id+"\n"
+    # print "gplus_id: "+gplus_id+"\n"
     login_session['access_token'] = credentials.access_token
 
     # Get user info
@@ -152,7 +155,7 @@ def gconnect():
     answer = requests.get(userinfo_url, params=params)
 
     data = answer.json()
-    print "user data: "+json.dumps(data)+"\n"
+    # print "user data: "+json.dumps(data)+"\n"
 
     # Store user data in session
     login_session['username'] = data['name']
