@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_setup import Category, Base, CatItem
+from database_setup import Category, Base, CatItem, User
 
 engine = create_engine('sqlite:///catalog.db')
 # Bind the engine to the metadata of the Base class so that the
@@ -20,13 +20,17 @@ session = DBSession()
 
 
 # Add testing data
-category1 = Category(name="Pets", description="Stuff for pets.")
+user1 = User(auth_id="1", name="admin")
+session.add(user1)
+session.commit()
+
+category1 = Category(name="Pets", description="Stuff for pets.", user_id=1)
 
 session.add(category1)
 session.commit()
 
 catItem1 = CatItem(name="bone", description="Bone for dogs.",
-                   category=category1)
+                   category=category1, user_id=1)
 
 session.add(catItem1)
 session.commit()

@@ -71,6 +71,7 @@ def registerUser():
                         auth_id=login_session['auth_id']).first()
     if auth_user:
         # user already exists, send to homepage
+        login_session['user_id'] = auth_user.id
         flash("You are already registered!", "alert-success")
         return redirect(url_for('showCategories'))
     if request.method == 'POST':
@@ -79,8 +80,17 @@ def registerUser():
                        email=login_session['email'])
         session.add(newUser)
         session.commit()
-        flash("You are now registered!", "alert-success")
-        return redirect(url_for('showCategories'))
+        auth_user = session.query(User).filter_by(
+                            auth_id=login_session['auth_id']).first()
+        if auth_user:
+            # user already exists, send to homepage
+            login_session['user_id'] = auth_user.id
+            flash("You are now registered!", "alert-success")
+            return redirect(url_for('showCategories'))
+        else:
+            flash("An error occured during registration. Please try again.",
+                  "alert-success")
+            return render_template('signup-form.html', user=login_session)
     else:
         flash("To register click Register below.", "alert-success")
         return render_template('signup-form.html', user=login_session)
