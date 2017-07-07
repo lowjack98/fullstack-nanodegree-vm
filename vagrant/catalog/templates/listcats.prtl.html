@@ -19,7 +19,7 @@
           <div class="col-xs-10">
             <a href="{{ url_for('showCatItems',category_id = cat.id) }}">{{ cat.name }}</a>
           </div>
-          {% if user.access_token %}
+          {% if cat.user_id == user.user_id %}
             <div class="col-xs-2 text-right">
               <a href="{{ url_for('updateCategory',category_id = cat.id) }}">
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>

@@ -11,7 +11,7 @@
           <div class="col-xs-6">
             <a href="{{ url_for('showCatItemDetail',category_id = item.category.id, item_id = item.id) }}">{{ item.name }} ({{ item.category.name }})</a>
           </div>
-          {% if user.access_token %}
+          {% if item.user_id == user.user_id %}
             <div class="col-xs-6 text-right">
               <a href="{{ url_for('editCatItem',category_id = item.category.id, item_id = item.id) }}">
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>

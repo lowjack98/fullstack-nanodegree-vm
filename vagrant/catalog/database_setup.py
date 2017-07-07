@@ -14,7 +14,9 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     description = Column(String(250), nullable=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
     items = relationship("CatItem", cascade='all,delete-orphan')
+    user = relationship("User")
 
     @property
     def serialize(self):
@@ -22,7 +24,8 @@ class Category(Base):
         return {
             'name': self.name,
             'id': self.id,
-            'description': self.description
+            'description': self.description,
+            'user_id': self.user_id
         }
 
 
@@ -33,7 +36,9 @@ class CatItem(Base):
     name = Column(String(80), nullable=False)
     description = Column(String(250))
     category_id = Column(Integer, ForeignKey('category.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
     category = relationship("Category")
+    user = relationship("User")
 
     @property
     def serialize(self):
@@ -41,7 +46,8 @@ class CatItem(Base):
         return {
             'name': self.name,
             'id': self.id,
-            'description': self.description
+            'description': self.description,
+            'user_id': self.user_id
         }
 
 
@@ -52,6 +58,8 @@ class User(Base):
     auth_id = Column(Integer, nullable=False)
     name = Column(String(80), nullable=False)
     email = Column(String(80))
+    items = relationship("CatItem", cascade='all,delete-orphan')
+    categories = relationship("Category", cascade='all,delete-orphan')
 
     @property
     def serialize(self):

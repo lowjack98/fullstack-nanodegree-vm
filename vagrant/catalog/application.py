@@ -45,8 +45,8 @@ def verify_auth(f):
         if 'access_token' not in login_session:
             flash("You must be logged in for that action.", "alert-danger")
             return redirect(url_for('showLogin'))
-        auth_user = session.query(User)./
-        filter_by(auth_id=login_session['auth_id']).first()
+        auth_user = session.query(User).filter_by(
+                            auth_id=login_session['auth_id']).first()
         if not auth_user:
             flash("You are not a registered user.", "alert-danger")
             return redirect(url_for('registerUser'))
@@ -67,8 +67,8 @@ def showLogin():
 @verify_login
 def registerUser():
     # Show register form for GET
-    auth_user = session.query(User).\
-                        filter_by(auth_id=login_session['auth_id']).first()
+    auth_user = session.query(User).filter_by(
+                        auth_id=login_session['auth_id']).first()
     if auth_user:
         # user already exists, send to homepage
         flash("You are already registered!", "alert-success")
@@ -163,13 +163,14 @@ def gconnect():
     login_session['auth_id'] = data['id']
 
     # if user doesn't exist in db reroute to signup page
-    auth_user = session.query(User).\
-                        filter_by(auth_id=login_session['auth_id']).first()
+    auth_user = session.query(User).filter_by(
+                        auth_id=login_session['auth_id']).first()
     if not auth_user:
         flash("You are not a registered user.", "alert-danger")
         return redirect(url_for('registerUser'))
 
     # Otherwise complete login
+    login_session['user_id'] = auth_user.id
     return redirect(url_for('showCategories'))
 
 
@@ -193,6 +194,7 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
         del login_session['access_token']
+        del login_session['user_id']
         flash("Successfully Logged Out.", "alert-success")
         return redirect(url_for('showCategories'))
     else:
@@ -220,7 +222,8 @@ def createCategory():
     if request.method == 'POST':
         # redirect to home add status
         newCat = Category(name=request.form['catTitle'],
-                          description=request.form['catDesc'])
+                          description=request.form['catDesc'],
+                          user_id=login_session['user_id'])
         session.add(newCat)
         session.commit()
         flash("new category created!", "alert-success")
@@ -235,6 +238,10 @@ def updateCategory(category_id):
     # Show update form for GET
     # Update record on POST
     editedCat = session.query(Category).filter_by(id=category_id).one()
+    if editedCat.user_id != login_session['user_id']:
+        flash("You are not allowed to update a category you did not create!",
+              "alert-danger")
+        return redirect(url_for('showCategories'))
     if request.method == 'POST':
         if request.form['catTitle']:
             editedCat.name = request.form['catTitle']
@@ -255,14 +262,18 @@ def deleteCategory(category_id):
     # Show delete form for GET
     # Remove record on POST
     deletedCat = session.query(Category).filter_by(id=category_id).one()
+    if deletedCat.user_id != login_session['user_id']:
+        flash("You are not allowed to delete a category you did not create!",
+              "alert-danger")
+        return redirect(url_for('showCategories'))
     if request.method == 'POST':
         session.delete(deletedCat)
         session.commit()
         flash("category removed!", "alert-success")
         return redirect(url_for('showCategories'))
     else:
-        itemCnt = session.query(func.count(CatItem.id)).\
-                          filter_by(category_id=category_id).scalar()
+        itemCnt = session.query(func.count(CatItem.id)).filter_by(
+                          category_id=category_id).scalar()
         return render_template('catdelete.html', category=deletedCat,
                                user=login_session, item_cnt=itemCnt)
 
@@ -294,7 +305,8 @@ def createCatItem(category_id):
     if request.method == 'POST':
         newCatItem = CatItem(name=request.form['itemName'],
                              description=request.form['itemDesc'],
-                             category_id=request.form['itemCatId'])
+                             category_id=request.form['itemCatId'],
+                             user_id=login_session['user_id'])
         session.add(newCatItem)
         session.commit()
         flash("new item created!", "alert-success")
@@ -313,6 +325,10 @@ def editCatItem(category_id, item_id):
     # Update record on POST
     categories = session.query(Category).all()
     updatedCatItem = session.query(CatItem).filter_by(id=item_id).one()
+    if updatedCatItem.user_id != login_session['user_id']:
+        flash("You are not allowed to update an item you did not create!",
+              "alert-danger")
+        return redirect(url_for('showCatItems', category_id=category_id))
     if request.method == 'POST':
         if request.form['itemName']:
             updatedCatItem.name = request.form['itemName']
@@ -338,6 +354,10 @@ def deleteCatItem(category_id, item_id):
     # Show delete form for GET
     # Remove record on POST
     deletedCatItem = session.query(CatItem).filter_by(id=item_id).one()
+    if deletedCatItem.user_id != login_session['user_id']:
+        flash("You are not allowed to delete an item you did not create!",
+              "alert-danger")
+        return redirect(url_for('showCatItems', category_id=category_id))
     if request.method == 'POST':
         session.delete(deletedCatItem)
         session.commit()
